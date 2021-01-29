@@ -1,0 +1,25 @@
+image: docker:latest
+
+services:
+  - docker:dind
+
+stages:
+  - build
+  - package
+
+maven-build:
+  image: maven:3-jdk-8
+  stage: build
+  script: "mvn package"
+  artifacts:
+    paths:
+      - target/*.jar
+
+docker-build:
+  stage: package
+  script:
+    - mkdir -p pkg
+    - mv target/demo.war pkg/demo.war
+    - docker build -t hub-peerxp.pwslab.net/devops-assignment/java-1151 .
+    - docker login -u "abcdef" -p "xxx" "hub-peerxp.pwslab.net"
+    - docker push hub-peerxp.pwslab.net/devops-assignment/java-1151:latest
